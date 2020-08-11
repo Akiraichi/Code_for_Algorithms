@@ -173,8 +173,10 @@ class BaumWelch(object):
     def graph_P(self):
         seq = np.arange(self.__logP.size)
         plt.plot(seq, self.__logP)
-        plt.savefig('graph/logP.png')
-        plt.clf()
+        plt.show()
+        # If you want to save the image, use the following code
+        # plt.savefig('graph/logP.png')
+        # plt.clf()
 
     def __update(self, alpha, beta, x):
         denom = alpha[-1, :].sum().reshape(-1, 1)
@@ -191,14 +193,13 @@ class BaumWelch(object):
         self.__update_param(gamma, xi, x)
 
     def __numer(self, alpha, beta, x):
-        """"""
         # alpha[:-1, :]ではalphaの最後の行は含まれていないことに注意。t+1の分までalphaは必要ないから。
         _a = (np.tile(alpha[:-1, :], (self.c, 1, 1)).swapaxes(0, 1) * self.A.T).transpose(2, 0, 1)
         _b = self.B[:, x[1:]].T * beta[1:, :]
         return _a * _b
 
     def __update_param(self, gamma, xi, x):
-        """Step3 パラメータの更新"""
+        # Step 3
         self.A = xi.sum(axis=1) / gamma[:-1, :].sum(axis=0).reshape(-1, 1)
         # gammaとx==kであるself.mを積する。gammaの0番目の添字と self.mの1番目の添え字をダミー変数とする
         self.B = np.tensordot(gamma, [(x == k) for k in range(self.m)], axes=(0, 1)) / gamma.sum(axis=0).reshape(-1, 1)
@@ -222,5 +223,7 @@ class BaumWelch(object):
             plt.ylim(0.0, 1.0)
             plt.plot(seq, np.tile(param_t[:, i].reshape(-1, 1), seq.shape[0]).T, 'k-', linewidth=0.5)
             plt.plot(seq, pe)
-            plt.savefig('graph/{}{}.png'.format(param_str, i + 1))
-            plt.clf()
+            plt.show()
+            # If you want to save the image, use the following code
+            # plt.savefig('graph/{}{}.png'.format(param_str, i + 1))
+            # plt.clf()
